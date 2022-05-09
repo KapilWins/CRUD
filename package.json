@@ -1,0 +1,43 @@
+{
+  "name": "typescript-with-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.20.0",
+    "express": "^4.18.1",
+    "joi": "^17.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.3.2",
+    "npm-watch": "^0.11.0",
+    "dotenv": "^16.0.0",
+    "typescript": "^4.6.4"
+  },
+  "scripts": {
+    "build": "tsc --jsx react --project . ",
+    "dev": "npm run build && node ./src/.dist/index.js",
+    "start": "npm-watch dev",
+    "start-production": "node ./src/.dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "watch": {
+    "dev": {
+      "patterns": [
+        "."
+      ],
+      "quiet": false,
+      "legacyWatch": true,
+      "extensions": "ts, js, tsx"
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.31",
+    "@types/bcrypt": "^5.0.0",
+    "@types/express": "^4.17.13",
+    "nodemon": "^2.0.16"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

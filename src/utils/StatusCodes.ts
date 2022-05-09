@@ -1,0 +1,9 @@
+
+const STATUS_CODES = {
+    OK: 200,
+    CREATED: 201,
+    NO_CONTENT: 204,
+    UN_AUTHORIZED: 401,
+    NOT_FOUND: 404,
+}
+export default STATUS_CODES
