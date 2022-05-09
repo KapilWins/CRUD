@@ -1,7 +1,6 @@
 import { number, required, string } from 'joi';
 import user from '../interface/User/Iuser';
 import mongoose, { model } from 'mongoose';
-import bcrypt from 'bcrypt';
 
 const schema = mongoose.Schema;
 

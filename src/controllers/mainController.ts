@@ -22,8 +22,8 @@ let newUser = async function (req: Request, res: Response) {
     })
     const params = schema.validate(req.body, { abortEarly: false });
     if (params.error) {
-        res.status(403).send(params.error)
-        return
+        return SendResponse(res, { Error: params.error.message}, STATUS_CODES.BAD_REQUEST)
+        
     }
 
     // new user
@@ -44,7 +44,7 @@ let newUser = async function (req: Request, res: Response) {
 
 
     user.save()
-    return SendResponse(res, { message: 'User Created' }, STATUS_CODES.CREATED)
+    return SendResponse(res, { message: 'User Created', id:user._id }, STATUS_CODES.CREATED)
 }
 
 //get all user data
@@ -92,10 +92,11 @@ let updateById = async (req: Request, res: Response) => {
     try {
         const byId = await userData.findByIdAndUpdate(req.params.id, req.body);
         if (byId === null) {
-            return SendResponse(res, { Message: 'User not found' }, STATUS_CODES.NO_CONTENT)
+            return SendResponse(res, { Message: 'User not found' }, STATUS_CODES.NOT_FOUND)
 
-        } else {
-            return SendResponse(res, { Name: byId.name, Age: byId.age, Tech: byId.tech, Email: byId.email, Message :"Update Successful"}, STATUS_CODES.OK)
+        } 
+        else {
+            return SendResponse(res, { Name: byId.name, Age: byId.age, Tech: byId.tech, Email: byId.email, Message: "Update Successful" }, STATUS_CODES.OK)
         }
     } catch (error) {
         return SendResponse(res, { Message: 'User not found' }, STATUS_CODES.NOT_FOUND)

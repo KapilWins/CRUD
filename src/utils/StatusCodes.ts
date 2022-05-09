@@ -5,5 +5,6 @@ const STATUS_CODES = {
     NO_CONTENT: 204,
     UN_AUTHORIZED: 401,
     NOT_FOUND: 404,
+    BAD_REQUEST:400,
 }
 export default STATUS_CODES
