@@ -1,4 +1,4 @@
-import { number, required, string } from 'joi';
+import { any, number, required, string } from 'joi';
 import user from '../interface/User/Iuser';
 import mongoose, { model } from 'mongoose';
 
@@ -27,7 +27,9 @@ const userSchema = new schema<user>({
     password: {
         type: String,
         required: true,
-    }
+    },
+    
+    
 })
 const userModel = model('User', userSchema);
 export default userModel;

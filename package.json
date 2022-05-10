@@ -1,3 +1,4 @@
+
 {
   "name": "typescript-with-node",
   "version": "1.0.0",
@@ -16,9 +17,9 @@
   },
   "scripts": {
     "build": "tsc --jsx react --project . ",
-    "dev": "npm run build && node ./src/.dist/index.js",
+    "dev": "npm run build && node ./.dist/index.js",
     "start": "npm-watch dev",
-    "start-production": "node ./src/.dist/index.js",
+    "start-production": "node ./.dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "watch": {
@@ -34,6 +35,7 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/express": "^4.17.13",
+    "@types/jsonwebtoken": "^8.5.8",
     "@types/node": "^17.0.31",
     "nodemon": "^2.0.16"
   },

@@ -1,2 +1,7 @@
 import App from './app';
-new App(4000).listen();
+import dotenv from 'dotenv';
+dotenv.config()
+
+let port:any =process.env.PORT || 4000;
+
+new App(port).listen();

@@ -3,6 +3,8 @@ import { json } from "body-parser";
 import { connect, ConnectOptions } from "mongoose";
 import { route } from './route/mainRoute';
 
+
+
 export default class App {
     public app: Application;
     public port: number;
@@ -15,8 +17,10 @@ export default class App {
         this.connectToRoutes()
     }
 
+
     private connectToMongo() {
-        connect(`mongodb://localhost:27017/userData`, {
+        let DB_url = process.env.DATABASE_URL
+        connect(DB_url, {
             useUnifiedTopology: true,
             useNewUrlParser: true,
         } as ConnectOptions)
