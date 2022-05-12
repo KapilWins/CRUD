@@ -117,8 +117,9 @@ let login = async (req: Request, res: Response) => {
             if (passCheck === true) {
                 
                 //generate token
-                var token = jwt.sign({ _id: 'ghjkl' }, "asdfgh");
-console.log(token)
+                let secretKey= process.env.SECRET_KEY;
+                
+                var token = jwt.sign({ _id: '6279f2ff88048b9b42c1b240' },secretKey );
                  return SendResponse(res, { user: userExist,token:token, message: 'Login Successful' }, STATUS_CODES.OK)
                  
                 } else {
