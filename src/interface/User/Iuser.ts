@@ -6,7 +6,8 @@ export default interface user{
     tech:string;
     email:string;
     password:string;
-    status:string
+    status:string;
+    role:string;
 
 }
 

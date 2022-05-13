@@ -7,6 +7,7 @@ import STATUS_CODES from '../utils/StatusCodes'
 import IUSER from '../interface/User/Iuser';
 import jwt from 'jsonwebtoken';
 import userModel from '../models/userModel';
+import Joi from 'joi';
 const userData: any = new userStore();
 
 // create new users
@@ -21,20 +22,27 @@ let newUser = async function (req: Request, res: Response) {
             tech: joi.string().required(),
             email: joi.string().required(),
             password: joi.string().required(),
-        })
+            role: Joi.string().required()
+        });
         const params = schema.validate(req.body, { abortEarly: false });
         if (params.error) {
             return SendResponse(res, { error: params.error.message }, STATUS_CODES.BAD_REQUEST)
         }
         let userInput = req.body
         userInput.password = await bcrypt.hash(userInput.password, 10)
+        let user;
         try {
-            const user = await userData.createUser(userInput)
-            return SendResponse(res, { message: 'User Created', id: user._id }, STATUS_CODES.CREATED)
-        } catch {
+             user = await userData.createUser(userInput);
+             console.log('userdetails',user)
+        } catch(error) {
+            console.log(error);            
             //return invalid credential
             return SendResponse(res, { message: 'invalid credential' }, STATUS_CODES.BAD_REQUEST)
         }
+        // if(user){
+            return SendResponse(res, { message: 'User Created', id: user._id }, STATUS_CODES.CREATED)
+        // }
+
     }
 
     catch (e) {
@@ -96,19 +104,16 @@ let deleteUser = async (req: Request, res: Response) => {
     let user: IUSER
     try {
 
-        let userExist = await userData.findById(id)
+        
         
         user = await userData.deleteById(id)
         console.log(user)
 
+        return SendResponse(res, { message:'User Deleted' }, STATUS_CODES.OK)
 
-        // if (user !== null) {
-        //     return SendResponse(res, { Name: user.name, Age: user.age, Tech: user.tech }, STATUS_CODES.OK)
-        // } else {
-        //     return SendResponse(res, { Message: 'User not found' }, STATUS_CODES.NOT_FOUND)
-        // }
+     
     } catch (error) {
-        return SendResponse(res, { Message: 'User not found' }, STATUS_CODES.NOT_FOUND)
+        return SendResponse(res, { message: 'User not found' }, STATUS_CODES.NOT_FOUND)
     }
 
 }

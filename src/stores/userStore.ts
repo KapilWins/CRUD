@@ -36,9 +36,9 @@ export default class userStore {
         let user
         try {
             user = new userModel(userInput);
-            user.save()
+            user.save();
         } catch (error) {
-            console.log(error)
+            return error;
         }
         return user
     }
@@ -49,6 +49,7 @@ export default class userStore {
         let user: IUSER
         try {
             user = await userModel.findById(userId).lean()
+
             if (user !== null) {
                 let deletedUser = await userModel.updateOne({ _id: userId }, { $set: { status: status.INACTIVE } })
                 console.log(deletedUser)
