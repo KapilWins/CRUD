@@ -1,75 +1,118 @@
 import joi, { any } from 'joi';
 import e, { Request, Response } from 'express';
-import userModel from '../models/userModel';
-import jwt from 'jsonwebtoken'
+import userStore from '../stores/userStore';
 import bcrypt, { hash } from 'bcrypt';
 import SendResponse from '../utils/Response'
 import STATUS_CODES from '../utils/StatusCodes'
-
-const userData = userModel;
+import IUSER from '../interface/User/Iuser';
+import jwt from 'jsonwebtoken';
+import userModel from '../models/userModel';
+const userData: any = new userStore();
 
 // create new users
 
 let newUser = async function (req: Request, res: Response) {
-    
-    //validation
-    const schema = joi.object({
-        name: joi.string().required(),
-        age: joi.number().required(),
-        tech: joi.string().required(),
-        email: joi.string().required(),
-        password: joi.string().required(),
-    })
-    const params = schema.validate(req.body, { abortEarly: false });
-    if (params.error) {
-        return SendResponse(res, { Error: params.error.message}, STATUS_CODES.BAD_REQUEST)
-        
-    }
-    
-    // new user
-    let userInput = req.body;
-    
-    
-    //password hash 
-    userInput.password = await bcrypt.hash(userInput.password, 12);
-    
-    const user = new userData({
-        name: userInput.name,
-        age: userInput.age,
-        tech: userInput.tech,
-        email: userInput.email,
-        password: userInput.password,
-        token:userInput.token,
-    });
 
-    user.save()
-    return SendResponse(res, { message: 'User Created', id:user._id }, STATUS_CODES.CREATED)
+    try {
+        //validation
+        const schema = joi.object({
+            name: joi.string().required(),
+            age: joi.number().required(),
+            tech: joi.string().required(),
+            email: joi.string().required(),
+            password: joi.string().required(),
+        })
+        const params = schema.validate(req.body, { abortEarly: false });
+        if (params.error) {
+            return SendResponse(res, { error: params.error.message }, STATUS_CODES.BAD_REQUEST)
+        }
+        let userInput = req.body
+        userInput.password = await bcrypt.hash(userInput.password, 10)
+        try {
+            const user = await userData.createUser(userInput)
+            return SendResponse(res, { message: 'User Created', id: user._id }, STATUS_CODES.CREATED)
+        } catch {
+            //return invalid credential
+            return SendResponse(res, { message: 'invalid credential' }, STATUS_CODES.BAD_REQUEST)
+        }
+    }
+
+    catch (e) {
+        console.log(e)
+    }
+}
+
+//get by name
+let login = async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+    let user: IUSER
+    try {
+        user = await userData.getUserByEmail({ email })
+        if (user) {
+
+            const isValidPassword = await bcrypt.compare(password, user.password)
+
+            if (isValidPassword) {
+                //generate token
+                let secretKey = process.env.SECRET_KEY;
+                var token = jwt.sign({ _id: '6279f2ff88048b9b42c1b240' }, secretKey);
+                return SendResponse(res, { user: user, token: token, message: 'Login Successful' }, STATUS_CODES.OK)
+            } else {
+                //return invalid credential
+                return SendResponse(res, { message: 'invalid credential' }, STATUS_CODES.BAD_REQUEST)
+
+            }
+        } else {
+            //return invalid credential
+            return SendResponse(res, { message: 'invalid credential' }, STATUS_CODES.BAD_REQUEST)
+
+        }
+    } catch (error) {
+        return SendResponse(res, { message: 'invalid credential' }, STATUS_CODES.BAD_REQUEST)
+
+    }
 }
 
 //get all user data
+
 let allUser = async (req: Request, res: Response) => {
-    const users = await userData.find()
-    return SendResponse(res, { Data: users }, STATUS_CODES.OK)
-    
-    
+    let user: IUSER
+    try {
+        user = await userData.getAllUser({ allUser })
+
+
+        return SendResponse(res, { user: user, message: 'Login Successful' }, STATUS_CODES.OK)
+
+    } catch {
+        //return invalid credential
+        return SendResponse(res, { message: 'invalid credential' }, STATUS_CODES.BAD_REQUEST)
+
+    }
 }
 
 //delete user by id
 let deleteUser = async (req: Request, res: Response) => {
+    const id = req.params.id
+    let user: IUSER
     try {
-        const deleteData = await userData.findByIdAndDelete(req.params.id)
-        if (deleteData === null) {
-            return SendResponse(res, { Message: 'User not found' }, STATUS_CODES.NOT_FOUND)
-        }
+
+        let userExist = await userData.findById(id)
         
-        else {
-            return SendResponse(res, { deleteData, Message: "Deleted" }, STATUS_CODES.OK)
-        }
-        
+        user = await userData.deleteById(id)
+        console.log(user)
+
+
+        // if (user !== null) {
+        //     return SendResponse(res, { Name: user.name, Age: user.age, Tech: user.tech }, STATUS_CODES.OK)
+        // } else {
+        //     return SendResponse(res, { Message: 'User not found' }, STATUS_CODES.NOT_FOUND)
+        // }
     } catch (error) {
         return SendResponse(res, { Message: 'User not found' }, STATUS_CODES.NOT_FOUND)
     }
+
 }
+
 
 // //get by id
 let getById = async (req: Request, res: Response) => {
@@ -92,8 +135,8 @@ let updateById = async (req: Request, res: Response) => {
         const byId = await userData.findByIdAndUpdate(req.params.id, req.body);
         if (byId === null) {
             return SendResponse(res, { Message: 'User not found' }, STATUS_CODES.NOT_FOUND)
-            
-        } 
+
+        }
         else {
             return SendResponse(res, { Name: byId.name, Age: byId.age, Tech: byId.tech, Email: byId.email, Message: "Update Successful" }, STATUS_CODES.OK)
         }
@@ -102,39 +145,6 @@ let updateById = async (req: Request, res: Response) => {
     }
 }
 
-//login
-let login = async (req: Request, res: Response) => {
-    
-    try {
-        const email = req.body.email;
-        const password = req.body.password;
-        
-        
-        const userExist: any = await userData.findOne({ email: email });
-        if (userExist) {
-            //password compare
-            const passCheck = await bcrypt.compare(password, userExist.password)
-            if (passCheck === true) {
-                
-                //generate token
-                let secretKey= process.env.SECRET_KEY;
-                
-                var token = jwt.sign({ _id: '6279f2ff88048b9b42c1b240' },secretKey );
-                 return SendResponse(res, { user: userExist,token:token, message: 'Login Successful' }, STATUS_CODES.OK)
-                 
-                } else {
-                    return SendResponse(res, { message: "Invalid Credentials" }, STATUS_CODES.UN_AUTHORIZED)
-                }
-            } else {
-                return SendResponse(res, { Message: "Invalid Credentials" }, STATUS_CODES.UN_AUTHORIZED)
-            }
-            
-        } catch (error) {
-            return SendResponse(res, { Message: 'User not found' }, STATUS_CODES.NOT_FOUND)
-        }
-        
-        
-    }
 
 
 export const userController = {
@@ -144,8 +154,4 @@ export const userController = {
     getById,
     updateById,
     login
-}
-
-function token(token: any, arg1: string) {
-    throw new Error('Function not implemented.');
 }

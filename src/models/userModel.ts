@@ -1,7 +1,7 @@
 import { any, number, required, string } from 'joi';
 import user from '../interface/User/Iuser';
 import mongoose, { model } from 'mongoose';
-
+import {status} from '../utils/enum';
 const schema = mongoose.Schema;
 
 
@@ -27,6 +27,11 @@ const userSchema = new schema<user>({
     password: {
         type: String,
         required: true,
+    },
+    status: {
+        type: String,
+        enum : status,
+        default: status.ACTIVE,
     },
     
     

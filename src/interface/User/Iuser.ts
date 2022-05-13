@@ -1,4 +1,4 @@
-import { string } from "joi";
+import { any, string } from "joi";
 
 export default interface user{
     name:string;
@@ -6,6 +6,7 @@ export default interface user{
     tech:string;
     email:string;
     password:string;
+    status:string
 
 }
 
