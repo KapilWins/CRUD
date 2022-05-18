@@ -1,7 +1,7 @@
 import express, { Application } from "express";
 import { json } from "body-parser";
 import { connect, ConnectOptions } from "mongoose";
-import { route } from './route/mainRoute';
+import { route } from './route/main.Route';
 
 
 

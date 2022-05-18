@@ -1,4 +1,4 @@
-import { any, string } from "joi";
+import { ObjectId } from "mongoose";
 
 export default interface user{
     name:string;
@@ -8,10 +8,12 @@ export default interface user{
     password:string;
     status:string;
     role:string;
-
+    organisation: ObjectId;
 }
 
-export default interface request{
-    user : user
-    type : string
-}
+// export default interface organisation{
+//     organisation:String;
+// }
+
+
+

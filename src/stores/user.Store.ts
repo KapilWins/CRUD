@@ -1,8 +1,9 @@
 import IUSER from '../interface/User/Iuser';
-import userModel from '../models/userModel';
+import {organisation} from '../models/user.Model';
 import { Request } from 'express';
 import { any } from 'joi';
 import { status } from '../utils/enum';
+import mongoose from 'mongoose';
 
 export default class userStore {
 
@@ -11,7 +12,7 @@ export default class userStore {
         let user: IUSER
 
         try {
-            user = await userModel.findOne({ email })
+            user = await organisation.userModel.findOne({ email });
         } catch (error) {
             console.log(error)
         }
@@ -20,10 +21,11 @@ export default class userStore {
 
     //all user data
     async getAllUser({ allUser }) {
-        let user: IUSER
+        let user:any
 
         try {
-            user = await userModel.find({ allUser }).lean()
+            user = await organisation.userModel.find().populate("organisation");
+            
 
         } catch (error) {
             console.log(error)
@@ -31,12 +33,22 @@ export default class userStore {
         return user;
     }
 
-    //create new user
-    async createUser(userInput: any) {
-        let user
+    //create new user and organisation
+    async createOrganisation(userInput) {
+        let org
         try {
-            user = new userModel(userInput);
-            user.save();
+            org = await new organisation.organisationModel(userInput);
+            return org
+        } catch (error) {
+            return error;
+        }
+    
+    }
+    async createUser(userInput: any) {
+        let user: IUSER
+        try {
+            user = new organisation.userModel(userInput);
+      
         } catch (error) {
             return error;
         }
@@ -48,10 +60,10 @@ export default class userStore {
     async deleteById(userId) {
         let user: IUSER
         try {
-            user = await userModel.findById(userId).lean()
+            user = await organisation.userModel.findById(userId).populate("organisation");
 
             if (user !== null) {
-                let deletedUser = await userModel.updateOne({ _id: userId }, { $set: { status: status.INACTIVE } })
+                let deletedUser = await organisation.userModel.updateOne({ _id: userId }, { $set: { status: status.INACTIVE } })
                 console.log(deletedUser)
                 return deletedUser
                 

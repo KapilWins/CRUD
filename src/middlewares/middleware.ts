@@ -40,7 +40,7 @@ const auth = async (req, res, next) => {
 //         cb(null, Date.now() + file.originalname)
 //     }
 // })
-// const upload = multer({storage: storage});
+// const upload = multer({storage: storage}).single('testImage');
 
 
 
